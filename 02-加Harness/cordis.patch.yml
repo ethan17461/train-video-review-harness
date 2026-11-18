@@ -1,0 +1,96 @@
+# 加了 Harness 的复盘 Agent 配置
+# 用法：dsh web --patch 本文件（桌面上的「启动 DeepSeek Harness（加Harness版）.command」已经写好）
+# 只在「02-加Harness」工作区里做复盘测试。
+
+# 1. 模型：和基线测试完全一样
+- id: agent-default-model
+  name: "@deepseek-ai/dsh-agent-default-model"
+  config:
+    provider: deepseek-account
+    model: deepseek-flash
+    reasoningEffort: high
+
+# 2. 新的 Agent 预设「video-review」，并设为默认。
+#    这里重新列一份清单，没列的就没有。
+#    2026-11-18 负责人决定放开运行命令和读写文件，让 Agent 能使用电脑上的软件。
+#    上网和派子 Agent 仍然没有。放开之前的配置保存在 cordis.patch.最小权限版.yml。
+- id: agent-preset-registry
+  config:
+    default: video-review
+
+# 预设之外，原版还有两个全局小工具：切换文件夹、读 MCP 资源。复盘用不上，也关掉。
+- id: tool-working-directory
+  disabled: true
+- id: mcp-resources
+  disabled: true
+
+- insert:
+    - id: preset-video-review
+      name: "@deepseek-ai/dsh-agent-preset"
+      config:
+        id: video-review
+        order: 0
+        plugins:
+          # 身份说明
+          - id: persona
+            name: "@deepseek-ai/dsh-persona"
+            config:
+              prefix: 你是火车票短视频账号的数据复盘助手，由 {{model}} 模型驱动。
+          # 读工作区的 AGENTS.md（里面写着：先加载 video-review 规则）
+          - id: agent-instructions
+            name: "@deepseek-ai/dsh-agent-instructions"
+            config:
+              maxBytes: 65536
+          # 当前时间
+          - id: time-context
+            name: "@deepseek-ai/dsh-time-context"
+          # 运行命令、读写文件、搜索文件（和原版相同的工具）
+          - id: tool-bash
+            name: "@deepseek-ai/dsh-tool-bash"
+          - id: tool-fs
+            name: "@deepseek-ai/dsh-tool-fs"
+            config:
+              applyPatch: false
+          - id: tool-fs-search
+            name: "@deepseek-ai/dsh-tool-fs-search"
+            config:
+              sampleOverCapGlobResults: false
+          # 读 .agents/skills 里的 SKILL.md（规则说明书）
+          # 只读本工作区这一个文件夹，不加载电脑里其他技能（原版会把用户全局的技能都列出来）
+          - id: skill-filesystem
+            name: "@deepseek-ai/dsh-skill-filesystem"
+            config:
+              includeDefaultRoots: false
+              customSkillDirs:
+                - "/path/to/02-加Harness/.agents/skills"
+          - id: tool-skill
+            name: "@deepseek-ai/dsh-tool-skill"
+          # 对话太长时压缩（和原版一样）
+          - id: compaction
+            name: cordis:group
+            group: true
+            isolate:
+              compaction: true
+              toolResultPruner: true
+            config:
+              - id: compaction-basic
+                name: "@deepseek-ai/dsh-compaction-basic"
+              - id: command-compact
+                name: "@deepseek-ai/dsh-command-compact"
+              - id: tool-result-pruner
+                name: "@deepseek-ai/dsh-compaction-tool-result-pruner"
+                config:
+                  thresholdChars: 8192
+                  headChars: 4096
+                  tailChars: 1024
+          # 复盘工具（MCP）：读复盘结果、看来源、按组数条数、检查并保存报告
+          - id: mcp-video-review
+            name: "@deepseek-ai/dsh-mcp-client"
+            config:
+              serverName: video_review
+              transport: stdio
+              command: "node"
+              args:
+                - "/path/to/02-加Harness/工具/mcp-server.mjs"
+              cwd: "/path/to/02-加Harness"
+              failOnStartupError: true

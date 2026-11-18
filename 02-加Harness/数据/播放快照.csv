@@ -1,0 +1,16 @@
+﻿行号,平台,账号,平台作品ID,抓取时间(UTC),累计播放量
+R01,TikTok,@rail_uk,T101,2026-11-02T12:00:00Z,850
+R02,TikTok,@rail_uk,T101,2026-11-02T12:00:00Z,850
+R03,TikTok,@rail_uk,T101,2026-11-08T12:00:00Z,1300
+R04,Instagram,@rail_uk_ig,I201,2026-11-02T12:00:00Z,1000
+R05,Instagram,@rail_uk_ig,I201,2026-11-08T12:00:00Z,1300
+R06,TikTok,@rail_uk,T103,2026-11-02T12:00:00Z,0
+R07,TikTok,@rail_uk,T103,2026-11-08T12:00:00Z,
+R08,Instagram,@rail_uk_ig,I204,2026-11-02T12:00:00Z,300
+R09,Instagram,@rail_uk_ig,I204,2026-11-02T12:00:00Z,400
+R10,Instagram,@rail_uk_ig,I204,2026-11-08T12:00:00Z,900
+R11,TikTok,@rail_uk,T105,2026-11-02T12:00:00Z,
+R12,TikTok,@rail_uk,T105,2026-11-07T12:00:00Z,1200
+R13,Instagram,@rail_uk_ig,I206,2026-11-02T12:00:00Z,999
+R14,Instagram,@rail_uk_ig,I206,2026-11-08T12:00:00Z,1000
+R15,TikTok,@rail_uk,T999,2026-11-08T12:00:00Z,2000
